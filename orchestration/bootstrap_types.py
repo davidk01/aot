@@ -8,7 +8,6 @@ logger = logging.getLogger('bootstrap_types')
 
 class BootstrapTarError(Exception): pass
 
-
 class BootstrapType(object):
 
     @staticmethod
@@ -31,8 +30,9 @@ class BootstrapType(object):
 class Tar(BootstrapType):
     """
     The tar bootstrap type is a tar file that will be copied to the remote machine and then
-    unpacked. The tarball must contain bootstrap.sh because that's what will be executed. The bootstrap
-    script instance can also take a list of arguments that will be passed to bootstrap.sh as command line parameters.
+    unpacked. The tarball must contain bootstrap.sh because that's what will be executed. 
+    The bootstrap script instance can also take a list of arguments that will be passed to 
+    bootstrap.sh as command line parameters.
     """
 
     def __init__(self, tarfile, args):

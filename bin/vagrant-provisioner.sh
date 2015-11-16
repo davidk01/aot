@@ -3,8 +3,9 @@
 apt-get -q update
 apt-get -q -y upgrade
 apt-get -y autoremove
-apt-get -q -y --no-install-recommends install wget curl build-essential python2.7 python2.7-dev expect git htop \
-  libreadline6-dev zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 autoconf libgdbm-dev libncurses5-dev \
+apt-get -q -y --no-install-recommends install wget curl build-essential python2.7 \
+  python2.7-dev expect git htop libreadline6-dev zlib1g-dev libssl-dev \
+  libyaml-dev libsqlite3-dev sqlite3 autoconf libgdbm-dev libncurses5-dev \
   automake libtool bison pkg-config libffi-dev
 
 # easy_install, pip, and virtualenv
@@ -15,7 +16,7 @@ if [[ ! -f setuptools-2.2.tar.gz ]]; then
   pip2.7 install virtualenv
 fi
 
-# sneak in ruby stuff as well
+# ruby stuff as well
 if [[ ! $(which rvm) ]]; then
   echo "RVM not found. Installing."
   curl -sSL https://get.rvm.io | bash -s stable

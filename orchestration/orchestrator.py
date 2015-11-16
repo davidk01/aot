@@ -11,21 +11,21 @@ from orchestration.definitions import Pool, InstanceDefinition
 logger = logging.getLogger('orchestrator')
 
 # Dynamically create the exception classes.
-for error_class in ['SecretsFileError', 'PreflightError', 'UnknownInstanceDefinitionMethod',
-    'PoolTypeError', 'InstanceTypeError']:
+for error_class in ['SecretsFileError', 'PreflightError', \
+        'UnknownInstanceDefinitionMethod', 'PoolTypeError', 'InstanceTypeError']:
     globals()[error_class] = type(error_class, (Exception,), {})
 
 class Orchestrator(object):
     """
-    Contains instance and pool definitions and methods for starting those instances and running the bootstrap
-    sequences.
+    Contains instance and pool definitions and methods for starting those 
+    instances and running the bootstrap sequences.
     """
 
     class AllInstanceAccessor(object):
         """
         Might want to do extra things in the future so provide an accessor for indirection.
-        An example of something that could be useful is filtering out all instances that were not
-        properly initialized.
+        An example of something that could be useful is filtering out all instances that 
+        were not properly initialized.
         """
 
         def __get__(self, instance, _):
@@ -51,7 +51,8 @@ class Orchestrator(object):
                 self._access_key = secrets.readline().strip()
                 self._secret_key = secrets.readline().strip()
         else:
-            raise SecretsFileError, "Could not open {0} for reading access/secret key.".format(orchestrator_file)
+            raise SecretsFileError, "Could not open {0} for reading access/secret key.".format(
+                    orchestrator_file)
 
         self._instances, self._pools = [], []
         self._cluster_facts, self._all_instances = None, None
@@ -68,8 +69,8 @@ class Orchestrator(object):
 
     def add_instance(self, *args, **kwargs):
         """
-        Instead of passing in the definitions during initialization we now force instances to be
-        added with this method.
+        Instead of passing in the definitions during initialization we now force 
+        instances to be added with this method.
         """
         definition = InstanceDefinition(*args, **kwargs)
         self._instances.append(definition)
@@ -88,9 +89,11 @@ class Orchestrator(object):
                 logger.fatal("Some instances did not transition to 'running' state.")
                 break
 
-        not_running = [instance for instance in self.all_instances if not instance.state == 'running']
+        not_running = [instance for instance in self.all_instances if not \
+                instance.state == 'running']
         for instance in not_running:
-            logger.fatal("Instance did not transition to running state: instance name = {0}.", instance.name)
+            logger.fatal("Instance did not transition to running state: instance name = {0}.", 
+                    instance.name)
 
     @staticmethod
     def _start_threads_and_wait(threads):
@@ -106,12 +109,12 @@ class Orchestrator(object):
 
     def __getattr__(self, item):
         """
-        Some methods go directly to the underlying instances so just factor out the functionality with
-        __getattr__(). What gets left is the stuff that the orchestrator should truly worry about, i.e.
-        cluster level orchestration.
+        Some methods go directly to the underlying instances so just factor out the 
+        functionality with __getattr__(). What gets left is the stuff that the 
+        orchestrator should truly worry about, i.e.  cluster level orchestration.
         """
-        if item not in ['_attach_ebs_devices', '_establish_ssh_connection', '_run_bootstrap_sequence',
-            '_generate_ssh_keys']:
+        if item not in ['_attach_ebs_devices', '_establish_ssh_connection', \
+                '_run_bootstrap_sequence', '_generate_ssh_keys']:
             raise UnknownInstanceDefinitionMethod, \
                 "Can not use the given method on all instance definitions: {0}.".format(item)
 
@@ -137,10 +140,11 @@ class Orchestrator(object):
         Take all the root and user keys and append to root authorized_keys.
         """
         all_root_pub_keys = [instance.root_pub_key for instance in self.all_instances]
-        all_user_pub_keys = [instance.user_pub_key(instance.user) for instance in self.all_instances]
+        all_user_pub_keys = [instance.user_pub_key(instance.user) for instance in \
+                self.all_instances]
         all_keys = all_root_pub_keys + all_user_pub_keys
-        distribute_ssh_key_threads = [Thread(target=instance.add_pub_keys, args=(all_keys,)) for
-            instance in self.all_instances]
+        distribute_ssh_key_threads = [Thread(target=instance.add_pub_keys, args=(all_keys,)) \
+                for instance in self.all_instances]
         self._start_threads_and_wait(distribute_ssh_key_threads)
 
     def _upload_cluster_facts(self):
@@ -153,8 +157,8 @@ class Orchestrator(object):
 
         self._cluster_facts = facts
 
-        fact_upload_threads = [Thread(target=instance.upload_cluster_facts, args=(facts,)) for
-            instance in self.all_instances]
+        fact_upload_threads = [Thread(target=instance.upload_cluster_facts, args=(facts,)) \
+                for instance in self.all_instances]
         self._start_threads_and_wait(fact_upload_threads)
 
     def _write_cluster_facts(self):
